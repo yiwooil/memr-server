@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <hospital>
+        <id>A001</id>
+        <hospital_name>대우병원</hospital_name>
+        <mask_yn>n</mask_yn>
+        <database_url>jdbc:oracle:thin:jain_mob/jain_mob@152.149.100.30:1521:jainocs</database_url>
+        <home_url>A</home_url>
+        <scan_url>A</scan_url>
+        <presave_url>A</presave_url>
+        <mp4_url>A</mp4_url>
+        <pic_url>A</pic_url>
+        <interface_table_yn>y</interface_table_yn>
+        <emr_company>jaincom</emr_company>
+        <tpr_edit_button_hide_yn>y</tpr_edit_button_hide_yn>
+        <pwd_skp_yn>y</pwd_skp_yn>
+        <jain_com_pid_len>8</jain_com_pid_len>
+    </hospital>
+</config>

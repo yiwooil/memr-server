@@ -1,0 +1,345 @@
+USE [HIB70]
+GO
+/****** Object:  Trigger [dbo].[trg_2_bit]    Script Date: 04/29/2014 15:14:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER TRIGGER [dbo].[trg_2_bit] 
+   ON  [dbo].[signed_consent_form_hist]
+   AFTER INSERT
+AS 
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for trigger here
+    declare @pat_id varchar(50)
+    declare @in_out_flag varchar(1)
+    declare @scan_date varchar(8)
+    declare @scan_class varchar(4)
+    declare @scan_seq varchar(3)
+    declare @bf_scan_date varchar(8)
+    declare @bf_scan_seq varchar(3)
+    declare @reg_date varchar(8)
+    declare @reg_time varchar(6)
+    declare @reg_id varchar(50)
+    declare @emr_scan_file varchar(500)
+    declare @emr_scan_class varchar(50)
+    
+    -- 사진
+    declare @pic_seq numeric
+    declare @pic_emr_scan_file varchar(500)
+    
+    -- 임시저장을 찾기 위항 키
+    declare @work_scan_date varchar(8)
+    declare @work_scan_seq varchar(3)
+    
+    -- 임시저장테이블
+    declare @pre_bf_scan_date varchar(8)
+    declare @pre_bf_scan_seq varchar(3)
+    
+    -- 임시저장사진
+    declare @pre_pic_seq numeric
+    declare @pre_pic_emr_scan_file varchar(500)
+    
+    
+    
+    declare @EMRITMSEQ as int
+
+    --set nocount on
+	
+    declare ccf_ins cursor for
+    select pat_id
+         , in_out_flag
+         , scan_date
+         , scan_class
+         , scan_seq
+         , isnull(bf_scan_date,'') bf_scan_date
+         , isnull(bf_scan_seq,'') bf_scan_seq
+         , reg_date
+         , reg_time
+         , upper(reg_id) as reg_id
+         , emr_scan_file
+         , case when isnull(emr_scan_class,'')='' 
+                then 'DC002' 
+                else isnull(emr_scan_class,'') 
+           end as emr_scan_class
+      from inserted
+
+    open ccf_ins
+
+    fetch next from ccf_ins into @pat_id,@in_out_flag,@scan_date,@scan_class,@scan_seq,@bf_scan_date,@bf_scan_seq,@reg_date,@reg_time,@reg_id,@emr_scan_file,@emr_scan_class
+
+    while @@FETCH_STATUS=0
+    begin
+		set @EMRITMSEQ=1
+        insert into me_emrmaster(EMRATTEND /* 내원번호 */
+                                ,EMRCHTNUM /* 차트번호 */
+                                ,EMRADMFOR /* 입원,외래구분 */
+                                ,EMRBUNCOD /* 서식분류코드 */
+                                ,EMRRPTCOD /* 서식고유코드 */
+                                ,EMRRPTTYP /* 서식타입 */
+                                ,EMRREGDTE /* 등록일자 */
+                                ,EMRREGTIM /* 등록시간 */
+                                ,EMRDEPCOD /* 진료과목 */
+                                ,EMRETCMEM /* 참고사항 */
+                                ,EMRINSDTE /* 입력일자 */
+                                ,EMRINSTIM /* 입력시간 */
+                                ,EMRINSUID /* 입력id */
+                                ,EMRINSCOM /* 입력컴퓨터명 */
+                                ,EMRCNLDTE /* 삭제일자 */
+                                ,EMRCNLTIM /* 삭제시간 */
+                                ,EMRCNLUID /* 삭제id */
+                                ,EMRCNLCOM /* 삭제컴퓨터명 */
+                                ,EMRCANCEL /* 삭제여부 */
+                                )
+                          values('' /* 내원번호 */
+                                ,@pat_id /* 차트번호 */
+                                ,case when @in_out_flag='I' then 'A' else 'F' end /* 입원,외래구분 */
+                                ,@emr_scan_class /* 서식분류코드 */
+                                ,@emr_scan_class + @pat_id + @reg_date + @reg_time /* 서식고유코드 */
+                                ,'S' /* 서식타입 */
+                                ,substring(@reg_date,1,4)+'-'+SUBSTRING(@reg_date,5,2)+'-'+SUBSTRING(@reg_date,7,2) /* 등록일자 */
+                                ,substring(@reg_time,1,2)+':'+SUBSTRING(@reg_time,3,2)+':'+SUBSTRING(@reg_time,5,2) /* 등록시간 */
+                                ,'' /* 진료과목 */
+                                ,'' /* 참고사항 */
+                                ,substring(@reg_date,1,4)+'-'+SUBSTRING(@reg_date,5,2)+'-'+SUBSTRING(@reg_date,7,2) /* 입력일자 */
+                                ,substring(@reg_time,1,2)+':'+SUBSTRING(@reg_time,3,2)+':'+SUBSTRING(@reg_time,5,2) /* 입력시간 */
+                                ,@reg_id /* 입력id */
+                                ,'' /* 입력컴퓨터명 */
+                                ,'' /* 삭제일자 */
+                                ,'' /* 삭제시간 */
+                                ,'' /* 삭제id */
+                                ,'' /* 삭제컴퓨터명 */
+                                ,'0' /* 삭제여부 */
+                                )
+        insert into me_emrdetail(EMRRPTCOD /* 서식고유코드 */
+                                ,EMRITMSEQ /* 항목일련번호 */
+                                ,EMRITMCOD /* 항목코드 */
+                                ,EMRITMNAM /* 항목명칭 */
+                                ,EMRITMGUB /* 구분코드 */
+                                ,EMRITMVAL /* 항목내용 */
+                                ,EMRITMRTF /* 항목내용(rtf) */
+                                ,EMRINSDTE /* 입력일자 */
+                                ,EMRINSTIM /* 입력시간 */
+                                ,EMRINSUID /* 입력id */
+                                ,EMRINSCOM /* 입력컴퓨터명 */
+                                ,EMRCNLDTE /* 삭제일자 */
+                                ,EMRCNLTIM /* 삭제시간 */
+                                ,EMRCNLUID /* 삭제id */
+                                ,EMRCNLCOM /* 삭제컴퓨터명 */
+                                ,EMRCANCEL /* 삭제여부 */
+                                )
+                          values(@emr_scan_class + @pat_id + @reg_date + @reg_time /* 서식고유코드 */
+                                ,@EMRITMSEQ /* 항목일련번호 */
+                                ,'Path' /* 항목코드 */
+                                ,'Path' /* 항목명칭 */
+                                ,'' /* 구분코드 */
+                                ,@emr_scan_file /* 항목내용 */
+                                ,'' /* 항목내용(rtf) */
+                                ,substring(@reg_date,1,4)+'-'+SUBSTRING(@reg_date,5,2)+'-'+SUBSTRING(@reg_date,7,2) /* 입력일자 */
+                                ,substring(@reg_time,1,2)+':'+SUBSTRING(@reg_time,3,2)+':'+SUBSTRING(@reg_time,5,2) /* 입력시간 */
+                                ,@reg_id /* 입력id */
+                                ,'' /* 입력컴퓨터명 */
+                                ,'' /* 삭제일자 */
+                                ,'' /* 삭제시간 */
+                                ,'' /* 삭제id */
+                                ,'' /* 삭제컴퓨터명 */
+                                ,'0' /* 삭제여부 */
+                                )
+        -- OCS와의 연결키 저장
+        update signed_consent_form_hist
+           set EMRRPTCOD = @emr_scan_class + @pat_id + @reg_date + @reg_time
+             , EMRITMSEQ = @EMRITMSEQ
+         where pat_id = @pat_id 
+           and in_out_flag = @in_out_flag 
+           and scan_date = @scan_date
+           and scan_class = @scan_class
+           and scan_seq = @scan_seq
+           
+        -- 사진이 있으면 사진도 넘긴다.
+        declare pic_cursor cursor for
+        select pic_seq,emr_scan_file
+          from signed_consent_form_pic_hist
+         where pat_id = @pat_id
+           and in_out_flag = @in_out_flag
+           and scan_date = @scan_date
+           and scan_class = @scan_class
+           and scan_seq = @scan_seq
+         order by pic_seq
+        
+        open pic_cursor
+        fetch next from pic_cursor into @pic_seq,@pic_emr_scan_file
+        
+        while @@FETCH_STATUS=0
+        begin
+			set @EMRITMSEQ = @EMRITMSEQ + 1
+			insert into me_emrdetail(EMRRPTCOD /* 서식고유코드 */
+									,EMRITMSEQ /* 항목일련번호 */
+									,EMRITMCOD /* 항목코드 */
+									,EMRITMNAM /* 항목명칭 */
+									,EMRITMGUB /* 구분코드 */
+									,EMRITMVAL /* 항목내용 */
+									,EMRITMRTF /* 항목내용(rtf) */
+									,EMRINSDTE /* 입력일자 */
+									,EMRINSTIM /* 입력시간 */
+									,EMRINSUID /* 입력id */
+									,EMRINSCOM /* 입력컴퓨터명 */
+									,EMRCNLDTE /* 삭제일자 */
+									,EMRCNLTIM /* 삭제시간 */
+									,EMRCNLUID /* 삭제id */
+									,EMRCNLCOM /* 삭제컴퓨터명 */
+									,EMRCANCEL /* 삭제여부 */
+									)
+							  values(@emr_scan_class + @pat_id + @reg_date + @reg_time /* 서식고유코드 */
+									,@EMRITMSEQ /* 항목일련번호 */
+									,'Path' /* 항목코드 */
+									,'Path' /* 항목명칭 */
+									,'' /* 구분코드 */
+									,@pic_emr_scan_file /* 항목내용 */
+									,'' /* 항목내용(rtf) */
+									,substring(@reg_date,1,4)+'-'+SUBSTRING(@reg_date,5,2)+'-'+SUBSTRING(@reg_date,7,2) /* 입력일자 */
+									,substring(@reg_time,1,2)+':'+SUBSTRING(@reg_time,3,2)+':'+SUBSTRING(@reg_time,5,2) /* 입력시간 */
+									,@reg_id /* 입력id */
+									,'' /* 입력컴퓨터명 */
+									,'' /* 삭제일자 */
+									,'' /* 삭제시간 */
+									,'' /* 삭제id */
+									,'' /* 삭제컴퓨터명 */
+									,'0' /* 삭제여부 */
+									)
+			-- OCS와의 연결 키 업데이트
+			update signed_consent_form_pic_hist
+			   set EMRRPTCOD = @emr_scan_class + @pat_id + @reg_date + @reg_time
+				 , EMRITMSEQ = @EMRITMSEQ
+			 where pat_id=@pat_id 
+			   and in_out_flag = @in_out_flag 
+			   and scan_date = @scan_date
+			   and scan_class = @scan_class
+			   and scan_seq = @scan_seq
+			   and pic_seq = @pic_seq
+           									
+            fetch next from pic_cursor into @pic_seq,@pic_emr_scan_file
+        end
+        close pic_cursor
+        deallocate pic_cursor
+        
+        -- 임시저장
+        set @work_scan_date=@bf_scan_date
+        set @work_scan_seq=@bf_scan_seq
+        
+        while @work_scan_date<>'' and @work_scan_seq<>''
+        begin
+        
+			select @pre_bf_scan_date = isnull(bf_scan_date,'')
+			     , @pre_bf_scan_seq = isnull(bf_scan_seq,'')
+			  from presaved_consent_form_hist
+			 where pat_id = @pat_id
+			   and in_out_flag = @in_out_flag
+			   and scan_date = @work_scan_date
+			   and scan_class = @scan_class
+			   and scan_seq = @work_scan_seq
+			   
+			if @@ROWCOUNT>0
+            begin
+            
+                -- 임시저장사진
+				declare presaved_pic_cur cursor for
+				select pic_seq,isnull(emr_scan_file,'') emr_scan_file
+				  from presaved_consent_form_pic_hist
+				 where pat_id = @pat_id
+				   and in_out_flag = @in_out_flag
+				   and scan_date = @work_scan_date
+				   and scan_class = @scan_class
+				   and scan_seq = @work_scan_seq
+				   and isnull(emr_scan_file,'')<>''
+				 order by pic_seq
+				   
+				open presaved_pic_cur
+				fetch next from presaved_pic_cur into @pre_pic_seq,@pre_pic_emr_scan_file
+				while @@FETCH_STATUS=0
+				begin
+					set @EMRITMSEQ = @EMRITMSEQ + 1
+					insert into me_emrdetail(EMRRPTCOD /* 서식고유코드 */
+											,EMRITMSEQ /* 항목일련번호 */
+											,EMRITMCOD /* 항목코드 */
+											,EMRITMNAM /* 항목명칭 */
+											,EMRITMGUB /* 구분코드 */
+											,EMRITMVAL /* 항목내용 */
+											,EMRITMRTF /* 항목내용(rtf) */
+											,EMRINSDTE /* 입력일자 */
+											,EMRINSTIM /* 입력시간 */
+											,EMRINSUID /* 입력id */
+											,EMRINSCOM /* 입력컴퓨터명 */
+											,EMRCNLDTE /* 삭제일자 */
+											,EMRCNLTIM /* 삭제시간 */
+											,EMRCNLUID /* 삭제id */
+											,EMRCNLCOM /* 삭제컴퓨터명 */
+											,EMRCANCEL /* 삭제여부 */
+											)
+									  values(@emr_scan_class + @pat_id + @reg_date + @reg_time /* 서식고유코드 */
+											,@EMRITMSEQ /* 항목일련번호 */
+											,'Path' /* 항목코드 */
+											,'Path' /* 항목명칭 */
+											,'' /* 구분코드 */
+											,@pre_pic_emr_scan_file /* 항목내용 */
+											,'' /* 항목내용(rtf) */
+											,substring(@reg_date,1,4)+'-'+SUBSTRING(@reg_date,5,2)+'-'+SUBSTRING(@reg_date,7,2) /* 입력일자 */
+											,substring(@reg_time,1,2)+':'+SUBSTRING(@reg_time,3,2)+':'+SUBSTRING(@reg_time,5,2) /* 입력시간 */
+											,@reg_id /* 입력id */
+											,'' /* 입력컴퓨터명 */
+											,'' /* 삭제일자 */
+											,'' /* 삭제시간 */
+											,'' /* 삭제id */
+											,'' /* 삭제컴퓨터명 */
+											,'0' /* 삭제여부 */
+											)
+					-- OCS와의 연결 키 업데이트
+					update presaved_consent_form_pic_hist
+					   set EMRRPTCOD = @emr_scan_class + @pat_id + @reg_date + @reg_time
+						 , EMRITMSEQ = @EMRITMSEQ
+					 where pat_id = @pat_id
+					   and in_out_flag = @in_out_flag
+					   and scan_date = @work_scan_date
+					   and scan_class = @scan_class
+					   and scan_seq = @work_scan_seq
+					   and pic_seq = @pre_pic_seq
+					   
+				    fetch next from presaved_pic_cur into @pre_pic_seq,@pre_pic_emr_scan_file
+				end
+				
+				close presaved_pic_cur
+				deallocate presaved_pic_cur
+				
+            end
+            
+            -- 자료가 잘못발생할수가있어서...
+            if @work_scan_date=@pre_bf_scan_date and @work_scan_seq=@pre_bf_scan_seq
+            begin
+                set @work_scan_date = ''
+                set @work_scan_seq = ''
+            end
+            else
+            begin
+                set @work_scan_date = @pre_bf_scan_date
+                set @work_scan_seq = @pre_bf_scan_seq
+            end
+            
+        end
+        
+
+        fetch next from ccf_ins into @pat_id,@in_out_flag,@scan_date,@scan_class,@scan_seq,@bf_scan_date,@bf_scan_seq,@reg_date,@reg_time,@reg_id,@emr_scan_file,@emr_scan_class
+    end
+
+    close ccf_ins
+    deallocate ccf_ins
+  
+    set nocount off  
+END

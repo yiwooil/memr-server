@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <hospital>
+        <id>0134</id>
+        <hospital_name>백두병원</hospital_name>
+        <mask_yn>n</mask_yn>
+        <database_url>jdbc:sqlserver://192.168.1.24:5333;databaseName=Metro;user=sa;password=mms;</database_url>
+        <home_url>\\192.168.1.23\f$\FtpHome\</home_url>
+        <scan_url>\\192.168.1.23\i$\emr_scan\</scan_url>
+        <presave_url>\\192.168.1.23\i$\pre_save\</presave_url>
+        <mp4_url>\\192.168.1.23\i$\ccf_mp4\</mp4_url>
+        <pic_url>\\192.168.1.23\i$\ccf_pic\</pic_url>
+        <filename_prefix>\\192.168.1.23\i$\emr_scan\</filename_prefix>
+        <filename_prefix_presave>\\192.168.1.23\i$\pre_save\</filename_prefix_presave>
+        <filename_prefix_pic>\\192.168.1.23\i$\ccf_pic\</filename_prefix_pic>
+        <filename_prefix_mp4>\\192.168.1.23\i$\ccf_mp4\</filename_prefix_mp4>
+        <emr_scan_url>empty</emr_scan_url>
+        <ccf_image_format>jpg</ccf_image_format>
+        <interface_table_yn>n</interface_table_yn>
+        <emr_company>metrosoft</emr_company>
+    </hospital>
+</config>

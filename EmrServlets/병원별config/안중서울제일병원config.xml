@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <hospital>
+        <id>0103</id>
+        <hospital_name>서울제일병원</hospital_name>
+        <mask_yn>y</mask_yn>
+        <database_url>jdbc:sqlserver://192.168.1.197;databaseName=METRO;user=sa;password=mms;</database_url>
+        <home_url>I:/</home_url>
+        <scan_url>I:/emr_scan/</scan_url>
+        <presave_url>I:/pre_save/</presave_url>
+        <mp4_url>I:/ccf_mp4/</mp4_url>
+        <pic_url>I:/ccf_pic/</pic_url>
+        <ccf_image_format>jpg</ccf_image_format>
+        <interface_table_yn>n</interface_table_yn>
+        <filename_prefix>\\192.168.1.197\EMR_SCAN\</filename_prefix>
+        <emr_company>metrosoft</emr_company>
+    </hospital>
+</config>

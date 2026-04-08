@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <hospital>
+        <id>0049</id>
+        <hospital_name>현대유비스</hospital_name>
+        <mask_yn>y</mask_yn>
+        <database_url>jdbc:sqlserver://10.0.2.234;databaseName=METRO;user=sa;password=mms;</database_url>
+        <home_url>\\10.0.2.233\f$/FtpHome/</home_url>
+        <scan_url>\\10.0.2.233\j$/emr_scan_j/</scan_url>
+        <presave_url>\\10.0.2.233\j$/emr_scan_j/pre_save/</presave_url>
+        <mp4_url>\\10.0.2.233\j$/emr_scan_j/ccf_mp4/</mp4_url>
+        <pic_url>\\10.0.2.233\j$/emr_scan_j/ccf_pic/</pic_url>
+        <emr_scan_url>empty</emr_scan_url>
+        <filename_prefix>\\UVISCOMPLUSDTC\EMR_SCAN_J\</filename_prefix>
+        <filename_prefix_presave>\\UVISCOMPLUSDTC\EMR_SCAN_J\pre_save\</filename_prefix_presave>
+        <filename_prefix_pic>\\UVISCOMPLUSDTC\EMR_SCAN_J\ccf_pic\</filename_prefix_pic>
+        <filename_prefix_mp4>\\UVISCOMPLUSDTC\EMR_SCAN_J\ccf_mp4\</filename_prefix_mp4>
+        <ccf_image_format>jpg</ccf_image_format>
+        <interface_table_yn>n</interface_table_yn>
+        <patient_safe_check_yn>y</patient_safe_check_yn>
+        <certificate_hide_yn>n</certificate_hide_yn>
+        <emr_company>metrosoft</emr_company>
+    </hospital>
+</config>

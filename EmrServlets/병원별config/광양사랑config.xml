@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <hospital>
+        <id>0058</id>
+        <hospital_name>광양사랑</hospital_name>
+        <mask_yn>y</mask_yn>
+        <database_url>jdbc:sqlserver://211.227.219.114;databaseName=METRO;user=sa;password=mms;</database_url>
+        <home_url>\\211.227.219.113\F$\ftphome\</home_url>
+        <scan_url>\\211.227.219.113\I$\emr_scan\</scan_url>
+        <presave_url>\\211.227.219.113\I$\pre_save\</presave_url>
+        <mp4_url>\\211.227.219.113\I$\ccf_mp4\</mp4_url>
+        <pic_url>\\211.227.219.113\I$\ccf_pic\</pic_url>
+        <ccf_image_format>jpg</ccf_image_format>
+        <interface_table_yn>n</interface_table_yn>
+        <emr_company>metrosoft</emr_company>
+    </hospital>
+</config>

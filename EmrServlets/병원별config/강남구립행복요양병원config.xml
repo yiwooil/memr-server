@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <hospital>
+        <id>C001</id>
+        <hospital_name>강남구립행복요양병원</hospital_name>
+        <mask_yn>n</mask_yn>
+        <database_url>jdbc:sqlserver://HIBSERVER;databaseName=HIB70;user=bit;password=hib;</database_url>
+        <home_url>D:/memr_folders/</home_url>
+        <scan_url>D:/memr_folders/emr_scan/</scan_url>
+        <presave_url>D:/memr_folders/pre_save/</presave_url>
+        <mp4_url>D:/memr_folders/ccf_mp4/</mp4_url>
+        <pic_url>D:/memr_folders/ccf_pic/</pic_url>
+        <interface_table_yn>y</interface_table_yn>
+        <emr_company>bit</emr_company>
+        <emr_scan_url>\\hibserver\Data\Scan\</emr_scan_url>
+        <emr_scan_url_format>1</emr_scan_url_format>
+        <emr_date_format>yyyy-mm-dd</emr_date_format>
+        <emr_time_format>hh:mm:ss</emr_time_format>
+        <emr_resid_format>123456-1234567</emr_resid_format>
+        <in_patient_list_doct_deptnm>y</in_patient_list_doct_deptnm>
+        <in_patient_list_doct_popup_button_hide_yn>y</in_patient_list_doct_popup_button_hide_yn>
+        <tpr_edit_button_hide_yn>y</tpr_edit_button_hide_yn>
+        <pwd_skp_yn>y</pwd_skp_yn>
+    </hospital>
+</config>
