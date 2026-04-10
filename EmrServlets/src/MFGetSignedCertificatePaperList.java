@@ -56,6 +56,8 @@ public class MFGetSignedCertificatePaperList implements MFGet {
 			sql += "     , isnull(g02.dptcd,'') as dptcd" + "\r\n"; // 2026.02.04 WOOIL - 추가.
 			sql += "     , isnull(g02.drid,'') as drid" + "\r\n"; // 2026.02.04 WOOIL - 추가.
 			sql += "     , isnull(g02.qfycd,'') as qfycd" + "\r\n"; // 2026.02.04 WOOIL - 추가.
+			sql += "     , isnull(g02.tsa_status,'') as tsa_status" + "\r\n"; // 2026.04.10 WOOIL - 추가
+			sql += "     , isnull(g02.tsa_date,'') as tsa_date" + "\r\n"; // 2026.04.10 WOOIL - 추가
 			sql += "  from tg02 g02 " + "\r\n";
 			sql += " where g02.pid=?" + "\r\n";
 			sql += "   and g02.exdt between ? and ?" + "\r\n";
