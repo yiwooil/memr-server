@@ -92,7 +92,9 @@ public class MFGetEmrScanList implements MFGet {
 			sql += "		     then isnull(g02.rptnm2,'') + ' ' + '(¸ð¹ÙÀÏ)'" + "\r\n"; 
 			sql += "            else (case when isnull(g01.rptnm,'')='' then isnull(g02.rptnm2,'') else isnull(g01.rptnm,'') end)" + "\r\n";
 			sql += "       end as rptnm" + "\r\n";
-			sql += " 	  , g02.path,null path2" + "\r\n";
+			sql += " 	 , g02.path,null path2" + "\r\n";
+			sql += "     , isnull(g02.tsa_status,'') as tsa_status" + "\r\n";
+			sql += "     , isnull(g02.tsa_date,'') as tsa_date" + "\r\n";
 			sql += "  from tg02 g02 left join tg01 g01 on g01.rptcd=g02.rptcd" + "\r\n";
 			sql += " where g02.pid=?" + "\r\n";
 			sql += "   and g02.exdt between ? and ?" + "\r\n";
