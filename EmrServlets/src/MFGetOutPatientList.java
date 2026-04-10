@@ -24,8 +24,10 @@ public class MFGetOutPatientList implements MFGet {
 		String dept = (String)param.get("dept");
 		String pdrid = (String)param.get("pdrid");
 		String sortOrder = (String)param.get("sortorder");
+		String rsvInOnly = (String)param.get("rsv_in_only");
 		
 		if(sortOrder==null) sortOrder="1";
+		if(rsvInOnly==null) rsvInOnly="";
 		
 		//String pid2=""; // 자인컴은 id2가 있음.
 		
@@ -40,7 +42,7 @@ public class MFGetOutPatientList implements MFGet {
 			//boolean interfaceTableYn = sqlHelper.getInterfaceTableYn();
 			//boolean isJaincom = sqlHelper.isJaincom();
 			String sql="";
-			sql = getSql(exdt, dept, pdrid, sortOrder);
+			sql = getSql(exdt, dept, pdrid, sortOrder, rsvInOnly);
 
 			para.put(++idx, exdt);
 			if(!"".equals(dept)) para.put(++idx, dept);
@@ -57,10 +59,11 @@ public class MFGetOutPatientList implements MFGet {
 		return returnString;
 	}
 
-	private String getSql(String exdt, String dept, String pdrid, String sortOrder){
+	private String getSql(String exdt, String dept, String pdrid, String sortOrder, String rsvInOnly){
 		String key=sortOrder+",exdt";
 		if(!"".equals(dept)) key+=",dptcd";
 		if(!"".equals(pdrid)) key+=",pdrid";
+		key+=","+rsvInOnly;
 		if(sqlMap.containsKey(key)==false){
 			String sql = "";
 			sql += "select a01.pnm";
@@ -88,6 +91,10 @@ public class MFGetOutPatientList implements MFGet {
 			if(!"".equals(pdrid)){
 				sql +=
 					"   and s21.drid=?";
+			}
+			if("y".equalsIgnoreCase(rsvInOnly)){
+				sql +=
+					"   and exists (select * from tt02 t02 where t02.pid=s21.pid and t02.odt=s21.exdt and t02.dptcd=s21.dptcd and t02.pdrid=s21.drid)";
 			}
 			if("1".equals(sortOrder)){
 				// 접수일시

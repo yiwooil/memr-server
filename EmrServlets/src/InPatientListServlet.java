@@ -147,7 +147,7 @@ public class InPatientListServlet extends HttpServlet {
 	}
 	private String getOutPatientList(HttpServletRequest request) {
 		new LogWrite().debugWrite(getClass().getSimpleName(), "getOutPatientList", "Ω√¿€");
-		String paraKeys[] = new String[] {"hospitalid","userid","sortorder","exdt","dept","pdrid","sortorder"};
+		String paraKeys[] = new String[] {"hospitalid","userid","sortorder","exdt","dept","pdrid","sortorder","rsv_in_only"};
 		MFGet instance = null;
 		instance = MFGetOutPatientList.getInstance();
 		try {
