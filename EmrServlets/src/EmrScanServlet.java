@@ -106,24 +106,56 @@ public class EmrScanServlet extends HttpServlet {
 			return;
 		}
 		
+		ServletOutputStream out = response.getOutputStream();
+
+		if (returnByte == null) {
+
+		    response.setContentType("image/png");
+
+		    int w = 300;
+		    int h = 100;
+		    int type = BufferedImage.TYPE_3BYTE_BGR;
+		    BufferedImage image = new BufferedImage(w, h, type);
+		    Graphics g = image.getGraphics();
+		    g.drawString("자료가 없습니다.", 10, 50);
+		    ImageIO.write(image, "png", out);
+
+		} else {
+
+		    String contentType = guessContentType(returnByte);
+
+		    try {
+		        ByteArrayInputStream bais = new ByteArrayInputStream(returnByte);
+		        BufferedImage image = ImageIO.read(bais);
+
+		        if (image != null) {
+		            // 읽을 수 있는 정상 이미지면 PNG로 변환해서 응답
+		            response.setContentType("image/png");
+		            ImageIO.write(image, "png", out);
+		        } else {
+		            // ImageIO가 읽지 못하면 원본 그대로 응답
+		            response.setContentType(contentType);
+		            out.write(returnByte, 0, returnByte.length);
+		        }
+
+		    } catch (Exception ex) {
+		        // CMYK JPEG 등 ImageIO 처리 실패 시 원본 그대로 응답
+		        new LogWrite().errorWrite(getClass().getSimpleName(), "doGet", "ImageIO ExceptionClass", ex.getClass().getName());
+		        new LogWrite().errorWrite(getClass().getSimpleName(), "doGet", "ImageIO ExceptionMessage", ex.getMessage());
+
+		        response.setContentType(contentType);
+		        out.write(returnByte, 0, returnByte.length);
+		    }
+		}
+
+		out.close();
+		
+		/*
 		response.setContentType("image/png");
 		ServletOutputStream out = response.getOutputStream();
 
 		if (returnByte == null) {
 
-			/*
-			String tmpPath = "";
-			try {
-				SqlHelper sqlHelper = new SqlHelper(hospitalId);
-				tmpPath = sqlHelper.getScanUrl();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			} catch (Exception e) {
-				
-			}
-			*/
-				
 			int w = 300;
 			int h = 100;
 			int type = BufferedImage.TYPE_3BYTE_BGR;
@@ -147,28 +179,10 @@ public class EmrScanServlet extends HttpServlet {
 		    }
 
 		    ImageIO.write(image, "png", out);
-		    
-			/* 2026.04.02 WOOIL - 표준화.제거
-			ByteArrayOutputStream bs = new ByteArrayOutputStream();
-			ByteArraySeekableStream bass = new ByteArraySeekableStream(returnByte);
-			String[] decNames = ImageCodec.getDecoderNames(bass);
-			// ImageDecoder dec =
-			// ImageCodec.createImageDecoder("tiff",bass,null);
-			ImageDecoder dec = ImageCodec.createImageDecoder(decNames[0], bass, null);
-			RenderedImage image = dec.decodeAsRenderedImage(0);
-			
-			PNGEncodeParam param = new PNGEncodeParam.Palette();
-			ImageEncoder enc = ImageCodec.createImageEncoder("png", out, param);
-			enc.encode(image);
-
-			// response.setContentType("image/png");
-			// ServletOutputStream out = response.getOutputStream();
-			// out.write(returnByte, 0, returnByte.length);
-			// out.close();
-			*/
 		}
 
 		out.close();
+		*/
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -263,6 +277,7 @@ public class EmrScanServlet extends HttpServlet {
 		try {
 			sqlHelper = new SqlHelper(hospitalId);
 			String path = getCcfFileName(hospitalId, ccfId);
+			new LogWrite().debugWrite(getClass().getSimpleName(), "getCcfImageFile", "path=" + path);
 			String filePath = Utility.concatFilePath(sqlHelper.getHomeUrl(), "Form" ,path);
 			new LogWrite().debugWrite(getClass().getSimpleName(), "getCcfImageFile", "filePath=" + filePath);
 			byte[] returnByte = sqlHelper.getFileForByte(filePath);
@@ -359,6 +374,31 @@ public class EmrScanServlet extends HttpServlet {
 		
 	}
 	
+	private String guessContentType(byte[] data) {
+	    if (data == null || data.length < 8) {
+	        return "application/octet-stream";
+	    }
+
+	    // PNG signature: 89 50 4E 47 0D 0A 1A 0A
+	    if ((data[0] & 0xFF) == 0x89 &&
+	        (data[1] & 0xFF) == 0x50 &&
+	        (data[2] & 0xFF) == 0x4E &&
+	        (data[3] & 0xFF) == 0x47 &&
+	        (data[4] & 0xFF) == 0x0D &&
+	        (data[5] & 0xFF) == 0x0A &&
+	        (data[6] & 0xFF) == 0x1A &&
+	        (data[7] & 0xFF) == 0x0A) {
+	        return "image/png";
+	    }
+
+	    // JPEG signature: FF D8
+	    if ((data[0] & 0xFF) == 0xFF &&
+	        (data[1] & 0xFF) == 0xD8) {
+	        return "image/jpeg";
+	    }
+
+	    return "application/octet-stream";
+	}	
 //	private byte[] getEmrScanFile_test(String hospitalId, String path) {
 //		SqlHelper sqlHelper;
 //		try {

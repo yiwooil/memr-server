@@ -711,6 +711,7 @@ public class SqlHelper {
 				// emrScanUrl의 값이 empty이면 fileName을 그대로 사용한다.
 				filePath = fileName;
 			}
+			new LogWrite().debugWrite(getClass().getSimpleName(), "getEmrScanFile", "filePath=" + filePath);
 			return getFileForByte(filePath);
 		}
 		catch(Exception e) {
@@ -806,15 +807,32 @@ public class SqlHelper {
 	
 	public byte[] getFileForByte(String filePath) throws Exception {
 		File file = new File(filePath);
-		if(file.length()==0){
-			return null;
-		}else{
-			byte buffer[] = new byte[(int)file.length()];
-			BufferedInputStream input = new BufferedInputStream(new FileInputStream(filePath));
-			input.read(buffer,0,buffer.length);
-			input.close();
-			return buffer;
-		}
+		
+		//new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "filePath=" + filePath);
+	    //new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "exists=" + file.exists());
+	    //new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "isFile=" + file.isFile());
+	    //new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "canRead=" + file.canRead());
+	    //new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "length=" + file.length());
+
+	    if (!file.exists()) {
+	        throw new FileNotFoundException("파일이 존재하지 않습니다. filePath=" + filePath);
+	    }
+	    if (!file.isFile()) {
+	        throw new IOException("정상 파일이 아닙니다. filePath=" + filePath);
+	    }
+	    if (!file.canRead()) {
+	        throw new IOException("파일 읽기 권한이 없습니다. filePath=" + filePath);
+	    }
+	    if (file.length() == 0) {
+	        throw new IOException("파일 크기가 0입니다. filePath=" + filePath);
+	    }		
+	    
+		byte buffer[] = new byte[(int)file.length()];
+		BufferedInputStream input = new BufferedInputStream(new FileInputStream(filePath));
+		input.read(buffer,0,buffer.length);
+		input.close();
+		return buffer;
+		
 	}
 
 	/*
