@@ -808,11 +808,11 @@ public class SqlHelper {
 	public byte[] getFileForByte(String filePath) throws Exception {
 		File file = new File(filePath);
 		
-		//new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "filePath=" + filePath);
-	    //new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "exists=" + file.exists());
-	    //new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "isFile=" + file.isFile());
-	    //new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "canRead=" + file.canRead());
-	    //new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "length=" + file.length());
+		new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "filePath=" + filePath);
+	    new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "exists=" + file.exists());
+	    new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "isFile=" + file.isFile());
+	    new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "canRead=" + file.canRead());
+	    new LogWrite().debugWrite(getClass().getSimpleName(), "getFileForByte", "length=" + file.length());
 
 	    if (!file.exists()) {
 	        throw new FileNotFoundException("파일이 존재하지 않습니다. filePath=" + filePath);

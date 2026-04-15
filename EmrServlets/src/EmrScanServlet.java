@@ -37,30 +37,10 @@ public class EmrScanServlet extends HttpServlet {
 		if(ccfId==null) ccfId="";
 		if(drid==null) drid="";
 		
-		/* 2013.02.12 WOOIL - 
-		 *      파일을 매번 서버에서 읽어오지 않고 베이스캠프서버에 보관했다가 다시 읽으면 빨라질것 같아서
-		 *      그렇게 했으나 눈에 띠는 속도개선의 효과가 없었음.
-		 *      
-		 *      이미지의 크기가 더 큰 영향을 주는 것 같다.
-		 *      
-		 *      getEmrScanFile_test가 베이스캠프서버에 보관하는 버전임.
-		 *      추후를 위하여 남겨놓음.
-		 *      
-		String test = request.getParameter("test"); // 테스트 기간에만 사용
-
-		byte[] returnByte = null;
-		if(test==null) test="";
-		if("".equals(test)){
-			returnByte = getEmrScanFile(hospitalId, path);
-		}else{
-			returnByte = getEmrScanFile_test(hospitalId, path);
-		}
-		*/
-		
 		new LogWrite().debugWrite(getClass().getSimpleName(), "doGet", "mode=" + mode);
 		
 		
-		byte[] returnByte = null;//getEmrScanFile(hospitalId, path);
+		byte[] returnByte = null;
 		if("9".equalsIgnoreCase(mode)){
 			// 의사 사인 이미지를 불러온다.
 			returnByte = getSignImageFile(hospitalId, drid);
@@ -107,9 +87,11 @@ public class EmrScanServlet extends HttpServlet {
 		}
 		
 		ServletOutputStream out = response.getOutputStream();
-
+		
 		if (returnByte == null) {
 
+	    	new LogWrite().debugWrite(getClass().getSimpleName(), "doGet", "returnByte is null.");
+	    	
 		    response.setContentType("image/png");
 
 		    int w = 300;
@@ -124,65 +106,41 @@ public class EmrScanServlet extends HttpServlet {
 
 		    String contentType = guessContentType(returnByte);
 
-		    try {
-		        ByteArrayInputStream bais = new ByteArrayInputStream(returnByte);
-		        BufferedImage image = ImageIO.read(bais);
-
-		        if (image != null) {
-		            // 읽을 수 있는 정상 이미지면 PNG로 변환해서 응답
-		            response.setContentType("image/png");
-		            ImageIO.write(image, "png", out);
-		        } else {
-		            // ImageIO가 읽지 못하면 원본 그대로 응답
-		            response.setContentType(contentType);
-		            out.write(returnByte, 0, returnByte.length);
-		        }
-
-		    } catch (Exception ex) {
-		        // CMYK JPEG 등 ImageIO 처리 실패 시 원본 그대로 응답
-		        new LogWrite().errorWrite(getClass().getSimpleName(), "doGet", "ImageIO ExceptionClass", ex.getClass().getName());
-		        new LogWrite().errorWrite(getClass().getSimpleName(), "doGet", "ImageIO ExceptionMessage", ex.getMessage());
-
-		        response.setContentType(contentType);
+	    	new LogWrite().debugWrite(getClass().getSimpleName(), "doGet", "contentType=" + contentType);
+	    	
+		    // PDF는 ImageIO 처리하지 말고 원본 그대로 반환
+		    if ("application/pdf".equalsIgnoreCase(contentType)) {
+		        response.setContentType("application/pdf");
+		        response.setHeader("Content-Disposition", "inline; filename=\"consent.pdf\"");
 		        out.write(returnByte, 0, returnByte.length);
+		    } else {
+			    try {
+			        ByteArrayInputStream bais = new ByteArrayInputStream(returnByte);
+			        BufferedImage image = ImageIO.read(bais);
+	
+			        if (image != null) {
+			            // 읽을 수 있는 정상 이미지면 PNG로 변환해서 응답
+			            response.setContentType("image/png");
+			            ImageIO.write(image, "png", out);
+			        } else {
+			            // ImageIO가 읽지 못하면 원본 그대로 응답
+			            response.setContentType(contentType);
+			            out.write(returnByte, 0, returnByte.length);
+			        }
+	
+			    } catch (Exception ex) {
+			        // CMYK JPEG 등 ImageIO 처리 실패 시 원본 그대로 응답
+			        new LogWrite().errorWrite(getClass().getSimpleName(), "doGet", "ImageIO ExceptionClass", ex.getClass().getName());
+			        new LogWrite().errorWrite(getClass().getSimpleName(), "doGet", "ImageIO ExceptionMessage", ex.getMessage());
+	
+			        response.setContentType(contentType);
+			        out.write(returnByte, 0, returnByte.length);
+			    }
 		    }
 		}
 
 		out.close();
 		
-		/*
-		response.setContentType("image/png");
-		ServletOutputStream out = response.getOutputStream();
-
-		if (returnByte == null) {
-
-			int w = 300;
-			int h = 100;
-			int type = BufferedImage.TYPE_3BYTE_BGR;
-			BufferedImage image = new BufferedImage(w, h, type);
-			Graphics g = image.getGraphics();
-			g.drawString("자료가 없습니다.", 10, 50);
-			ImageIO.write(image, "png", out);
-				
-		} else {
-
-			ByteArrayInputStream bais = new ByteArrayInputStream(returnByte);
-		    BufferedImage image = ImageIO.read(bais);
-
-		    if (image == null) {
-		        int w = 300;
-		        int h = 100;
-		        int type = BufferedImage.TYPE_3BYTE_BGR;
-		        image = new BufferedImage(w, h, type);
-		        Graphics g = image.getGraphics();
-		        g.drawString("이미지 형식을 읽을 수 없습니다.", 10, 50);
-		    }
-
-		    ImageIO.write(image, "png", out);
-		}
-
-		out.close();
-		*/
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -375,12 +333,23 @@ public class EmrScanServlet extends HttpServlet {
 	}
 	
 	private String guessContentType(byte[] data) {
-	    if (data == null || data.length < 8) {
+	    if (data == null || data.length < 4) {
 	        return "application/octet-stream";
 	    }
 
+	    // PDF signature: %PDF-
+	    if (data.length >= 5 &&
+	        data[0] == 0x25 &&   // %
+	        data[1] == 0x50 &&   // P
+	        data[2] == 0x44 &&   // D
+	        data[3] == 0x46 &&   // F
+	        data[4] == 0x2D) {   // -
+	        return "application/pdf";
+	    }
+
 	    // PNG signature: 89 50 4E 47 0D 0A 1A 0A
-	    if ((data[0] & 0xFF) == 0x89 &&
+	    if (data.length >= 8 &&
+	        (data[0] & 0xFF) == 0x89 &&
 	        (data[1] & 0xFF) == 0x50 &&
 	        (data[2] & 0xFF) == 0x4E &&
 	        (data[3] & 0xFF) == 0x47 &&
@@ -398,7 +367,8 @@ public class EmrScanServlet extends HttpServlet {
 	    }
 
 	    return "application/octet-stream";
-	}	
+	}
+	
 //	private byte[] getEmrScanFile_test(String hospitalId, String path) {
 //		SqlHelper sqlHelper;
 //		try {
