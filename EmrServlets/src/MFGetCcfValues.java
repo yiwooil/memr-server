@@ -101,6 +101,7 @@ public class MFGetCcfValues implements MFGet {
 			String ccfW  = rsCcfValueMast.getString(ccfIdx, "ccf_w");
 			String ccfH  = rsCcfValueMast.getString(ccfIdx, "ccf_h");
 			String ccfAutoFit = rsCcfValueMast.getString(ccfIdx, "ccf_auto_fit"); // 2024.04.26 WOOIL -
+			String ccfTypeName = rsCcfValueMast.getString(ccfIdx, "ccf_type_name"); // 2026.04.20 WOOIL -
 			String ccfValue = "";
 			
 			
@@ -289,7 +290,8 @@ public class MFGetCcfValues implements MFGet {
 			columns.put("ccf_w", ccfW);
 			columns.put("ccf_h", ccfH);
 			columns.put("ccf_auto_fit", ccfAutoFit); // 2024.04.26 WOOIL -
-			columns.put("ccf_value", ccfValue);
+			columns.put("ccf_type_name", ccfTypeName); // 2026.04.20 WOOIL -
+			columns.put("ccf_value", ccfValue); 
 			rowData.add(columns);
 		}
 		
@@ -489,14 +491,16 @@ public class MFGetCcfValues implements MFGet {
 		//}else{
 		//	sql = "select cdnm ccf_field,fld1qty ccf_x,fld2qty ccf_y,fld3qty ccf_w,fld4qty ccf_h from ta88a where mst1cd='EMR' and mst2cd='FORM' and mst3cd=?";
 		//}
-		 // 2024.04.26 WOOIL - ccf_auto_fit 추가
+		
+		 
 		sql = "";
 		sql += "select cdnm as ccf_field" + "\n";
 		sql += "     , fld1qty as ccf_x" + "\n";
 		sql += "     , fld2qty as ccf_y" + "\n";
 		sql += "     , fld3qty as ccf_w" + "\n";
 		sql += "     , fld4qty as ccf_h" + "\n";
-		sql += "     , isnull(fld1cd,'') as ccf_auto_fit" + "\n";
+		sql += "     , isnull(fld1cd,'') as ccf_auto_fit" + "\n"; // 2024.04.26 WOOIL - ccf_auto_fit 추가
+		sql += "     , isnull(fld2cd,'') as ccf_type_name" + "\n"; // 2026.04.20 WOOIL - type_name 추가
 		sql += "  from ta88a" + "\n";
 		sql += " where mst1cd='EMR' and mst2cd='FORM' and mst3cd=?";
 		para.put(1, ccfId);
