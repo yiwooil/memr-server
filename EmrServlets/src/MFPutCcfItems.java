@@ -42,7 +42,7 @@ public class MFPutCcfItems implements MFPut {
 		//if(interfaceTableYn){
 		//	sql2 = "insert into consent_form_value_mast(ccf_id,seq_no,ccf_field,ccf_x,ccf_y,ccf_w,ccf_h) values(?,?,?,?,?,?,?)";
 		//}else{
-			sql2 = "insert into ta88a(mst1cd,mst2cd,mst3cd,mst4cd,cdnm,fld1qty,fld2qty,fld3qty,fld4qty,fld1cd) values('EMR','FORM',?,?,?,?,?,?,?,?)";
+			sql2 = "insert into ta88a(mst1cd,mst2cd,mst3cd,mst4cd,cdnm,fld1qty,fld2qty,fld3qty,fld4qty,fld1cd,fld2cd) values('EMR','FORM',?,?,?,?,?,?,?,?,?)";
 		//}
 		
 		ccfItems += ":"; // 오류방지용
@@ -57,6 +57,7 @@ public class MFPutCcfItems implements MFPut {
 			String ccfW = valueArray[3];
 			String ccfH = valueArray[4];
 			String ccfAutoFit = valueArray[5];
+			String ccfTypeName = valueArray[6];
 			
 			HashMap<Integer, Object>para2 = new HashMap<Integer, Object>();
 			para2.put(1, ccfId);
@@ -67,6 +68,7 @@ public class MFPutCcfItems implements MFPut {
 			para2.put(6, ccfW);
 			para2.put(7, ccfH);
 			para2.put(8, ccfAutoFit);
+			para2.put(9, ccfTypeName);
 			
 			paraList2.add(para2);
 		}

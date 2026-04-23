@@ -631,7 +631,7 @@ public class MFGetCcfValues implements MFGet {
 			sql += "     , a04.wardid+'-'+a04.rmid as ward" + "\n";// bed는 작성하지 않는다. 스마트병원이 이렇게 되어있음.
 			sql += "     , (select a09.dptnm from ta09 a09 (nolock) where a09.dptcd=a04.wardid) as wardnm" + "\n"; // 2024.07.18 WOOIL - 병동명
 			sql += "     , a04.rmid" + "\n"; // 2024.07.18 WOOIL - 병실ID 
-			sql += "     , (select top 1 t05.dxd from tt05 t05 where t05.pid=a04.pid and t05.bdedt=a04.bededt order by convert(numeric,t05.ptysq),t05.seq) as dxd" + "\n";
+			sql += "     , (select top 1 t05.dxd from tt05 t05 where t05.pid=a04.pid and t05.bdedt=a04.bededt order by convert(numeric,case when t05.ptysq='' then '99' else t05.ptysq end),t05.seq) as dxd" + "\n";
 			sql += "     , isnull(a56.maddr,'') as maddr" + "\n";
 			sql += "     , isnull(a56.insnm,'') as insnm" + "\n";
 			sql += "     , isnull(a56.famrelcd,'') as famrelcd" + "\n";
@@ -705,7 +705,7 @@ public class MFGetCcfValues implements MFGet {
 			sql += "     , '' as ward" + "\n"; // bed는 작성하지 않는다. 스마트병원이 이렇게 되어있음.
 			sql += "     , '' as wardnm" + "\n";
 			sql += "     , '' as rmid" + "\n";
-			sql += "     , (select top 1 s06.dxd from ts06 s06 where s06.pid=s21.pid and s06.exdt=s21.exdt and s06.dptcd=s21.dptcd order by convert(numeric,s06.ptysq),s06.seq) as dxd" + "\n";
+			sql += "     , (select top 1 s06.dxd from ts06 s06 where s06.pid=s21.pid and s06.exdt=s21.exdt and s06.dptcd=s21.dptcd order by convert(numeric,case when s06.ptysq='' then '99' else s06.ptysq end),s06.seq) as dxd" + "\n";
 			sql += "     , isnull(a56.maddr,'') as maddr" + "\n";
 			sql += "     , isnull(a56.insnm,'') as insnm" + "\n";
 			sql += "     , isnull(a56.famrelcd,'') as famrelcd" + "\n";

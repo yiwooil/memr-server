@@ -100,10 +100,10 @@ public class MFGetInPatientSearchList implements MFGet {
 		SqlHelper sqlHelper;
 		ResultSetHelper rs;
 		String returnString;
+		String sql="";
 		try {
 			int idx=0;
 			sqlHelper = new SqlHelper(hospitalId);
-			String sql="";
 			sql=getSql(sortOrder,exdt,searchiofg,pidYn,pnmYn,residYn);
  
 			if("".equals(exdt)){
@@ -201,7 +201,7 @@ public class MFGetInPatientSearchList implements MFGet {
 					sql += "     , (select a07.drnm from ta07 a07 (nolock) where a07.drid=s21.drid) as pdrnm" + "\r\n";
 					sql += "     , s21.qfycd as qfycd" + "\r\n";
 					sql += "     , (select a88.cdnm from ta88 a88 (nolock) where a88.mst1cd='a' and a88.mst2cd='26' and a88.mst3cd=s21.qfycd) as qfycdnm" + "\r\n";
-					sql += "     , isnull((select top 1 dxd from ts06 s06 (nolock) where s06.pid=s21.pid and s06.exdt=s21.exdt and s06.dptcd=s21.dptcd order by convert(numeric,s06.ptysq),s06.seq),'') as dxd" + "\r\n";
+					sql += "     , isnull((select top 1 dxd from ts06 s06 (nolock) where s06.pid=s21.pid and s06.exdt=s21.exdt and s06.dptcd=s21.dptcd order by convert(numeric,case when s06.ptysq='' then '99' else s06.ptysq end),s06.seq),'') as dxd" + "\r\n";
 					sql += "     , a01.bthdt" + "\r\n";
 					sql += "     , s21.drid" + "\r\n"; // 2024.06.21 WOOIL - 
 					sql += "     , a01.resid1"; // 2024.09.09 WOOIL -
@@ -243,7 +243,7 @@ public class MFGetInPatientSearchList implements MFGet {
 					sql += "     , (select a07.drnm from ta07 a07 (nolock) where a07.drid=a04.pdrid) as pdrnm" + "\r\n";
 					sql += "     , a04.qlfycd as qfycd" + "\r\n";
 					sql += "     , (select a88.cdnm from ta88 a88 (nolock) where a88.mst1cd='a' and a88.mst2cd='26' and a88.mst3cd=a04.qlfycd) as qfycdnm" + "\r\n";
-					sql += "     , isnull((select top 1 dxd from tt05 t05 (nolock) where t05.pid=a04.pid and t05.bdedt=a04.bededt order by convert(numeric,t05.ptysq),t05.seq),'') as dxd" + "\r\n";
+					sql += "     , isnull((select top 1 dxd from tt05 t05 (nolock) where t05.pid=a04.pid and t05.bdedt=a04.bededt order by convert(numeric,case when t05.ptysq='' then '99' else t05.ptysq end),t05.seq),'') as dxd" + "\r\n";
 					sql += "     , a01.bthdt" + "\r\n";
 					sql += "     , a04.pdrid as drid" + "\r\n";
 					sql += "     , a01.resid1"; // 2024.09.09 WOOIL -

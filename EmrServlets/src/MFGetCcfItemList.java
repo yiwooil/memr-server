@@ -205,6 +205,19 @@ public class MFGetCcfItemList implements MFGet  {
 			rowData.add(columns);
 		}
 		
+		// 2026.04.21 WOOIL - PDF문서용
+        String[] ary_pdf = new String[] { 
+                "pdf_field"
+        };
+		for(int i=0 ; i<ary_pdf.length ; i++){
+			rowCount++;
+			columns = new JSONObject();	
+			columns.put("ccf_field", ary_pdf[i]);
+			columns.put("ccf_field_text", getFieldText(ary_pdf[i]));
+			rowData.add(columns);
+		}
+		
+		
 
 		// 리턴값과 메시지
 		columns = new JSONObject();
@@ -452,6 +465,8 @@ public class MFGetCcfItemList implements MFGet  {
         if (field == "bi_onm_15") return "비급여 동의서 명칭 15";
         if (field == "bi_gumak_15") return "비급여 동의서 금액 15";
         if (field == "bi_gumak_tot") return "비급여 동의서 금액 합계";
+        
+        if (field == "pdf_field") return "PDF 필드";
 
         return field;
     }

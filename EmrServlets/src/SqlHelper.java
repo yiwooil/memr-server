@@ -305,7 +305,7 @@ public class SqlHelper {
 					}
 					columns.put(columnName, columnValue);
 					
-					//new LogWrite().debugWrite(getClass().getSimpleName(), "executeQueryLocal", "columnName=" + columnName + ", orgColumnValue=" + orgColumnValue + ", columnValue=" + columnValue);
+					//new LogWrite().debugWrite(getClass().getSimpleName(), "executeQuery", "columnName=" + columnName + ", orgColumnValue=" + orgColumnValue + ", columnValue=" + columnValue);
 
 				}
 				rowData.add(columns);
@@ -333,7 +333,8 @@ public class SqlHelper {
 				return result.toJSONString();
 			}
 		}catch(Exception ex) {
-			new LogWrite().errorWrite(getClass().getSimpleName(), "executeQueryLocal", "Exception", ex.getLocalizedMessage());
+			new LogWrite().errorWrite(getClass().getSimpleName(), "executeQuery", "Exception", ex.getLocalizedMessage());
+			new LogWrite().errorWrite(getClass().getSimpleName(), "executeQuery", "Exception", "sql=" +sql);
 			// 리턴값과 메시지
 			columns = new JSONObject();
 			columns.put("return_code",-1);
