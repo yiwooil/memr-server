@@ -99,7 +99,16 @@ public class EmrScanServlet extends HttpServlet {
 		    int type = BufferedImage.TYPE_3BYTE_BGR;
 		    BufferedImage image = new BufferedImage(w, h, type);
 		    Graphics g = image.getGraphics();
-		    g.drawString("자료가 없습니다.", 10, 50);
+		    
+		    if("9".equalsIgnoreCase(mode)){
+		    	// 2026.04.24 WOOIL - 사인 이미지를 반환하는 중이면...
+			    //                    배경을 흰색으로 채움
+		    	//                    사인이 없는 경우 안드로이드 단말기에 검은색 박스가 그려지는 현상을 회피하기 위함임.
+			    g.setColor(java.awt.Color.WHITE);
+			    g.fillRect(0, 0, w, h);
+		    } else {
+		    	g.drawString("자료가 없습니다.", 10, 50);
+		    }
 		    ImageIO.write(image, "png", out);
 
 		} else {
@@ -292,7 +301,12 @@ public class EmrScanServlet extends HttpServlet {
 		try {
 			Hospital hos = HospitalInformation.getHospital(hospitalId);
 			byte[] imageBytes = null;
-			String sql = "SELECT SignPIC FROM TA07_IMG WHERE DRID=?";
+			String sql = "";
+			if (drid.startsWith("AA")) {
+				sql = "SELECT SignPIC FROM TA07_IMG WHERE DRID=?";
+			} else {
+				sql = "SELECT SignPIC FROM TA13_IMG WHERE EMPID=?";
+			}
 			con = SqlHelper.getDataSource(hos.databaseUrl).getConnection();
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, drid);

@@ -104,7 +104,6 @@ public class MFGetCcfValues implements MFGet {
 			String ccfTypeName = rsCcfValueMast.getString(ccfIdx, "ccf_type_name"); // 2026.04.20 WOOIL -
 			String ccfValue = "";
 			
-			
 			String ccfFieldType = getCcfFieldType(ccfField);
 			//new LogWrite().debugWrite(getClass().getSimpleName(), "getData", "ccfField=" + ccfField + ", ccfFieldType=" + ccfFieldType);
 			if(!"".equals(pid)&&"ta01".equalsIgnoreCase(ccfFieldType)){
@@ -357,6 +356,8 @@ public class MFGetCcfValues implements MFGet {
 		else if("drsign".equalsIgnoreCase(ccfField)) retString="ta04"; // 2022.04.27 WOOIL - 의사 사인
 		else if("logindrnm".equalsIgnoreCase(ccfField)) retString="ta04"; // 2024.03.04 WOOIL - 로그인의사 명(실제처리는 화면에서 한다.) 
 		else if("logindrsign".equalsIgnoreCase(ccfField)) retString="ta04"; // 2024.05.30 WOOIL - 로그인의사 사인(실제처리는 화면에서 한다.)
+		else if("login_nm".equalsIgnoreCase(ccfField)) retString="ta04"; // 2024.06.24 WOOIL - 로그인사용자 명
+		else if("login_sign".equalsIgnoreCase(ccfField)) retString="ta04"; // 2024.06.24 WOOIL - 로그인사용자 사인(실제처리는 화면에서 한다.)
 		else if("gdrlcid".equalsIgnoreCase(ccfField)) retString="ta04"; // 2025.08.06 WOOIL - 주치의 면허번호
 		else if("sdrlcid".equalsIgnoreCase(ccfField)) retString="ta04"; // 2025.08.06 WOOIL - 주치의 전문의 번호
 		else if("logingdrlcid".equalsIgnoreCase(ccfField)) retString="ta04"; // 2025.08.06 WOOIL - 로그인의사 면허번호
@@ -618,6 +619,7 @@ public class MFGetCcfValues implements MFGet {
 			sql += "            then (select top 1 a94.usrnm from ta94 a94 where a94.usrid='" + userId + "')" + "\n";
 			sql += "            else (select a07.drnm from ta07 a07 where a07.drid=a04.pdrid)" + "\n";
 			sql += "       end as logindrnm" + "\n";
+			sql += "     , (select top 1 a94.usrnm from ta94 a94 where a94.usrid='" + userId + "') as login_nm" + "\n"; // 2026.04.24 WOOIL - 로그인사용자명
 			sql += "     , (select a07.gdrlcid from ta07 a07 where a07.drid=a04.pdrid) as gdrlcid" + "\n"; // 2025.08.06 WOOIL - 면허번호
 			sql += "     , (select a07.sdrlcid from ta07 a07 where a07.drid=a04.pdrid) as sdrlcid" + "\n"; // 2025.08.06 WOOIL - 전문의 번호
 			sql += "     , case when '" + userId + "' like 'AA%'" + "\n"; // 2025.08.06 WOOIL - 로그인의사 면허번호
@@ -642,6 +644,10 @@ public class MFGetCcfValues implements MFGet {
 			sql += "            then 'logindrsign_" + userDrId + "'" + "\n";
 			sql += "            else 'logindrsign_'+a04.pdrid" + "\n";
 			sql += "       end as logindrsign" + "\n";
+			sql += "     , case when '" + userId + "' like 'AA%'" + "\n";
+			sql += "            then 'login_sign_" + userDrId + "'" + "\n";
+			sql += "            else 'login_sign_" + userId + "'" + "\n";
+			sql += "       end as login_sign" + "\n";
 			sql += "  from ta04 a04 with (nolock) inner join ta01 a01 with (nolock) on a01.pid=a04.pid" + "\n";
 			sql += "                              left join ta56 a56 with (nolock) on a56.pid=a04.pid and a56.qlfycd=a04.qlfycd and a56.credt=(select max(z.credt) from ta56 z where z.pid=a56.pid and z.qlfycd=a56.qlfycd)" + "\n";
 			sql += " where a04.pid=? and a04.bededt=?";
@@ -690,6 +696,7 @@ public class MFGetCcfValues implements MFGet {
 			sql += "            then (select top 1 a94.usrnm from ta94 a94 where a94.usrid='" + userId + "')" + "\n";
 			sql += "            else (select a07.drnm from ta07 a07 where a07.drid=s21.drid)" + "\n";
 			sql += "       end as logindrnm" + "\n";
+			sql += "     , (select top 1 a94.usrnm from ta94 a94 where a94.usrid='" + userId + "') as login_nm" + "\n"; // 2026.04.24 WOOIL - 로그인사용자명
 			
 			sql += "     , (select a07.gdrlcid from ta07 a07 where a07.drid=s21.drid) as gdrlcid" + "\n"; // 2025.08.06 WOOIL - 면허번호
 			sql += "     , (select a07.sdrlcid from ta07 a07 where a07.drid=s21.drid) as sdrlcid" + "\n"; // 2025.08.06 WOOIL - 전문의 번호
@@ -716,6 +723,10 @@ public class MFGetCcfValues implements MFGet {
 			sql += "            then 'logindrsign_" + userDrId + "'" + "\n";
 			sql += "            else 'logindrsign_'+s21.drid" + "\n";
 			sql += "       end as logindrsign" + "\n";
+			sql += "     , case when '" + userId + "' like 'AA%'" + "\n";
+			sql += "            then 'login_sign_" + userDrId + "'" + "\n";
+			sql += "            else 'login_sign_" + userId + "'" + "\n";
+			sql += "       end as login_sign" + "\n";
 			sql += "  from ts21 s21 with (nolock) inner join ta01 a01 with (nolock) on a01.pid=s21.pid" + "\n";
 			sql += "                              left join ta56 a56 with (nolock) on a56.pid=s21.pid and a56.qlfycd=s21.qfycd and a56.credt=(select max(z.credt) from ta56 z where z.pid=a56.pid and z.qlfycd=a56.qlfycd)" + "\n";
 			sql += " where s21.pid=? and s21.exdt=? and s21.dptcd=? and isnull(s21.ccfg,'') in ('','0')" + "\n";

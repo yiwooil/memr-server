@@ -33,6 +33,7 @@ public class MFGetCcfItemList implements MFGet  {
 		String[] ary = new String[] { 
 				"pid", "pnm", "resid", "bthdt", "bthdt_mdy", "bthdt_dmy", "age", "psex", "addr", "htelno", "otelno", "ntelno", "bededt", "bedodt", "qfynm", 
 				"ibdyy", "ibdmm", "ibddd", "dptcd", "dptnm", "drnm", "drnm_eng", "drsign", "gdrlcid", "sdrlcid", "logindrnm", "logindrsign", "logingdrlcid", "loginsdrlcid", 
+				"login_nm", "login_sign",
 				"ward", "wardnm", "rmid", "dxd", 
 				"rsvop", "rsvdacd", "rsvopdt", "rsvopdptnm", "rsvopdrnm", "rsvopdt_ymd", "rsvop_2nd", "rsvdacd_2nd",
 				"yy", "mm", "dd", "mm_eng", "hhhh", "mmmm", "ssss", "yyyymmdd", "yyyymmdd_2" };
@@ -271,6 +272,8 @@ public class MFGetCcfItemList implements MFGet  {
         if (field == "logingdrlcid") return "로그인의사면허번호(>주치의)";
         if (field == "sdrlcid") return "주치의전문의번호";
         if (field == "loginsdrlcid") return "로그인의사전문의번호(>주치의)";
+        if (field == "login_nm") return "로그인사용자_명";
+        if (field == "login_sign") return "로그인사용자_사인";
         if (field == "ward") return "병실(병동-병실)";
         if (field == "wardnm") return "병동명"; // 2024.07.19 WOOIL - 추가
         if (field == "rmid") return "병실ID"; // 2024.07.19 WOOIL - 추가
