@@ -47,15 +47,16 @@ public class MFGetDoctList implements MFGet {
 			//}else{
 				// 2019.07.25 WOOIL - 퇴사의사제외,DRG,DRGBAL제외
 				sql = "";
-				sql += "select drid,drnm,drengnm,gdrlcid,sdrlcid,dptcd,'sign_'+drid as drsign";
-				sql += "  from ta07";
-				sql += " where isnull(drnm,'')<>''";
-				sql += "   and isnull(expdt,'')=''";
+				sql += "select a07.drid,a07.drnm,a07.drengnm,a07.gdrlcid,a07.sdrlcid,a07.dptcd,'sign_'+drid as drsign";
+				sql += "     , a09.dptnm";
+				sql += "  from ta07 a07 left join ta09 a09 on a09.dptcd=a07.dptcd";
+				sql += " where isnull(a07.drnm,'')<>''";
+				sql += "   and isnull(a07.expdt,'')=''";
 				sql += "   and drid not in ('DRG','DRGBAL')";
 				if(!"".equals(dptcd)){
-				sql += "   and dptcd='" + dptcd + "'"; // 특정진료과의 의사만
+				sql += "   and a07.dptcd='" + dptcd + "'"; // 특정진료과의 의사만
 				}
-				sql += " order by case when drid like 'AATEST%' then 1 else 0 end, drnm";
+				sql += " order by case when a07.drid like 'AATEST%' then 1 else 0 end, a07.drnm";
 			//}
 			String rsString=sqlHelper.executeQuery(sql);
 			returnString=rsString;

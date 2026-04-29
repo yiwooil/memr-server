@@ -47,6 +47,7 @@ public class MFGetCcfValues implements MFGet {
 		if(u01_pk_yn==null) u01_pk_yn="";
 		if(dong_exdt==null) dong_exdt="";
 		
+		
 		if("Y".equalsIgnoreCase(u01_pk_yn)){
 			new LogWrite().debugWrite(getClass().getSimpleName(), "getData", "1-1) u01_opdt=" + u01_opdt + ", u01_dptcd=" + u01_dptcd + ", u01_opseq=" + u01_opseq + ", u01_seq=" + u01_seq);
 		}
