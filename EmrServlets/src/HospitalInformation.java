@@ -95,6 +95,7 @@ public class HospitalInformation {
 				hos.useDrSignTable = rsHelper.getString(0,"use_dr_sign_table"); // 2025.08.12 WOOIL - 의사 사인을 테이블에서 읽을지 여부
 				hos.barcodeScannerYn = rsHelper.getString(0,"barcode_scanner_yn"); // 2026.01.29 WOOIL - 환자안전관리 화면에서 내장 카메라로 바코드를 읽을지 여부
 				hos.nrChartAiYn = rsHelper.getString(0,"nr_chart_ai_yn"); // 2026.03.20 WOOIL - 간호기록지에 AI기능 활성화 여부
+				hos.presavedConsentFormListCollapseYn = rsHelper.getString(0,"presaved_consent_form_list_collapse_yn"); // 2026.05.13 WOOIL - 임시저장동의서리서트 조회시 동의서+환자명인 경우 동의서별로 접혀서 조회되는지 여부
 			}
 			hosMap.put(hospitalId, hos);
 		}

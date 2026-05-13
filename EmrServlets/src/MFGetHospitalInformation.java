@@ -112,6 +112,7 @@ public class MFGetHospitalInformation implements MFGet {
 				columns.put("use_dr_sign_table", getElementValue(hosElement, "use_dr_sign_table")); // 2025.08.12 WOOIL - 의사 사인을 테이블에서 읽을지 여부
 				columns.put("barcode_scanner_yn", getElementValue(hosElement, "barcode_scanner_yn")); // 2026.01.29 WOOIL - 환자안전관리 화면에서 내장 카메라로 바코드를 읽을지 여부
 				columns.put("nr_chart_ai_yn", getElementValue(hosElement, "nr_chart_ai_yn")); // 2026.03.20 WOOIL - 간호기록지에 AI기능 활성화 여부
+				columns.put("presaved_consent_form_list_collapse_yn", getElementValue(hosElement, "presaved_consent_form_list_collapse_yn")); // 2026.05.13 WOOIL - 임시저장동의서리서트 조회시 동의서+환자명인 경우 동의서별로 접혀서 조회되는지 여부
 				// -------------------------------------------------------------------------
 				rowData.add(columns);
 			}
@@ -128,17 +129,30 @@ public class MFGetHospitalInformation implements MFGet {
 		return result.toJSONString();
 	}
 	
-	private String getElementValue(Element element, String tagName){
-		NodeList nodeList = element.getElementsByTagName(tagName);
-		String nodeValue = "";
-		if(nodeList.getLength()>0){
-			element = (Element)nodeList.item(0);
-			Node node = element.getFirstChild();
-			nodeValue = node.getNodeValue();
-		}else{
-			nodeValue="";
-		}
-		return nodeValue;
+	private String getElementValue(Element parentElement, String tagName) {
+	    if (parentElement == null || tagName == null) {
+	        return "";
+	    }
+
+	    NodeList nodeList = parentElement.getElementsByTagName(tagName);
+
+	    if (nodeList == null || nodeList.getLength() == 0) {
+	        return "";
+	    }
+
+	    Node node = nodeList.item(0);
+
+	    if (node == null) {
+	        return "";
+	    }
+
+	    String value = node.getTextContent();
+
+	    if (value == null) {
+	        return "";
+	    }
+
+	    return value.trim();
 	}
 	
 }
