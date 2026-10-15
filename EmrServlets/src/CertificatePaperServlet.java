@@ -96,6 +96,12 @@ public class CertificatePaperServlet extends HttpServlet {
 		} else if (mode.equals("22")) {
 			// 2026.04.01 WOOIL - 동의서가 삭제되었는지 검사한다.
 			resultString = getCertificateDelCheck(request);
+		} else if (mode.equals("23")) {
+			// 2026.10.14 WOOIL - 동의서 종류 코드리스트를 조회한다.
+			resultString = getRptcdList(request);
+		} else if (mode.equals("24")) {
+			// 2026.10.15 WOOIL - 촬영한 이미지를 동의서로 저장한다.
+			resultString = saveCertificateCamera(request);
 		} else {
 			resultString = "unimplemented method.";
 		}
@@ -138,7 +144,7 @@ public class CertificatePaperServlet extends HttpServlet {
 	}
 
 	private String getFileName(HttpServletRequest request) {
-		String paraKeys[] = new String[] {"hospitalid","userid","mst3cd","pid","bededt","presave","bdiv","apply_exdt"};
+		String paraKeys[] = new String[] {"hospitalid","userid","mst3cd","pid","bededt","presave","bdiv","apply_exdt","rptcd"};
 		MFGet instance = MFGetSaveCcfFileName.getInstance();
 		try {
 			return instance.getData(Utility.getParaMap(paraKeys, request));
@@ -424,8 +430,6 @@ public class CertificatePaperServlet extends HttpServlet {
 		}
 	}
 	
-	
-	
 	private String getCertificateDelCheck(HttpServletRequest request){
 		new LogWrite().debugWrite(getClass().getSimpleName(), "getCertificateDelCheck", "시작");
 		String paraKeys[] = new String[] {"hospitalid","userid","pid","bdiv","exdt","seq","presaved_yn"};
@@ -440,4 +444,33 @@ public class CertificatePaperServlet extends HttpServlet {
 			new LogWrite().debugWrite(getClass().getSimpleName(), "getCertificateDelCheck", "종료");
 		}
 	}
+	
+	private String getRptcdList(HttpServletRequest request){
+		new LogWrite().debugWrite(getClass().getSimpleName(), "getRptcdList", "시작");
+		String paraKeys[] = new String[] {"hospitalid"};
+		MFGet instance = MFGetRptcdList.getInstance();
+		try {
+			return instance.getData(Utility.getParaMap(paraKeys, request));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			new LogWrite().errorWrite(getClass().getSimpleName(), "getRptcdList", "Exception", e.getLocalizedMessage());
+			return ExceptionHelper.toJSONString(e);
+		} finally {
+			new LogWrite().debugWrite(getClass().getSimpleName(), "getRptcdList", "종료");
+		}
+	}
+	
+	private String saveCertificateCamera(HttpServletRequest request) {
+		String paraKeys[] = new String[] {"hospitalid","userid","rptcd","pid","bededt","bdiv","filename","apply_exdt","seq","sysdt","systm"
+				                         ,"dptcd","drid","qfycd"};
+		MFPut instance = MFPutCertificateCamera.getInstance();
+		try {
+			return instance.putData(Utility.getParaMap(paraKeys, request));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			new LogWrite().errorWrite(getClass().getSimpleName(), "saveCertificateCamera", "Exception", e.getLocalizedMessage());
+			return ExceptionHelper.toJSONString(e);
+		}
+	}
+	
 }

@@ -30,7 +30,7 @@ public class MFPutCertificateDel implements MFPut {
 			if(interfaceTableYn){
 				sql = "update consent_form_mast set del_yn='Y' where ccf_id=?";
 			}else{
-				sql = "update ta88 set fld4cd='Y' where mst1cd='EMR' and mst2cd='FORM' and mst3cd=?";
+				sql = "update ta88 set fld5cd='2' where mst1cd='EMR' and mst2cd='FORM' and mst3cd=?";
 			}
 			para.put(1, ccfId);
 			String rsString = sqlHelper.executeUpdate(sql, para);
