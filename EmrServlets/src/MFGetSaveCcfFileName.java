@@ -24,11 +24,13 @@ public class MFGetSaveCcfFileName implements MFGet {
 		String presave = (String)param.get("presave");
 		String bdiv = (String)param.get("bdiv");
 		String applyExdt = (String)param.get("apply_exdt"); // 2026.01.30 WOOIL - 사용자가 exdt를 수정할 수 있게 함.
+		String rptcd = (String)param.get("rptcd"); // 2026.10.15 WOOIL - 카메라로 촬영한 이미지를 동의서로 올리기 위해 추가.
 
 		if (pid == null) pid = "";
 		if (bededt == null) bededt = "";
 		if (bdiv == null) bdiv = "";
 		if (applyExdt == null) applyExdt = "";
+		if (rptcd == null) rptcd = "";
 
 		HashMap<Integer, Object>para = new HashMap<Integer,Object>();
 		
@@ -40,10 +42,10 @@ public class MFGetSaveCcfFileName implements MFGet {
 			sqlHelper = new SqlHelper(hospitalId);
 			boolean interfaceTableYn = sqlHelper.getInterfaceTableYn();
 			//
-			//String inoutfg = "I";
-			//if(bdiv.equals("1")) inoutfg = "O"; // 외래
-			String rptcd = "ZZ01"; // android에서 올린 사인이미지
-			//String path = "";
+			if (rptcd.trim().length() == 0) {
+			    rptcd = "ZZ01"; // android에서 올린 사인이미지
+			}
+
 			String sql = "";
 			StringBuilder sb = new StringBuilder();
 			if("Y".equalsIgnoreCase(presave)){
