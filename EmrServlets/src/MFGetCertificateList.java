@@ -45,19 +45,22 @@ public class MFGetCertificateList implements MFGet {
 				sql += " where isnull(a.del_yn,'')=''";
 				sql += " order by convert(numeric,disp_order) ";
 			}else{
-				sql += "select a.mst3cd ccf_id";
-				sql += "     , a.cdnm ccf_name";
-				sql += "     , case when isnull(a.fld1qty,'')='' then cdnm else a.fld1qty end as ccf_filename";
-				sql += "     , case when isnull(a.fld2cd,'')='' then '기타' else a.fld2cd end ccf_group";
-				sql += "     , isnull(a.fld3cd,'') as emr_scan_class";
-				sql += "     , isnull(b.rptnm,'') as emr_scan_class_name";
-				sql += "     , isnull(a.fld2qty,'') as sub_page_list";
-				sql += "     , isnull(a.fld3qty,'') as sub_page_no";
-				sql += "     , isnull(a.fld6cd,'') as hx_type";
-				sql += "  from ta88 a left join tg01 b on b.rptcd=a.fld3cd";
-				sql += " where a.mst1cd='EMR' and a.mst2cd='FORM'";
-				sql += "   and isnull(a.fld5cd,'')<>'2'"; // 2025.09.18 WOOIL - 제외기능
-				sql += " order by convert(numeric,a.fld1cd) ";
+				sql += "select a.mst3cd ccf_id" + "\r\n";
+				sql += "     , a.cdnm ccf_name" + "\r\n";
+				sql += "     , case when isnull(a.fld1qty,'')='' then cdnm else a.fld1qty end as ccf_filename" + "\r\n";
+				sql += "     , case when isnull(a.fld2cd,'')='' then '기타' else a.fld2cd end ccf_group" + "\r\n";
+				sql += "     , isnull(a.fld3cd,'') as emr_scan_class" + "\r\n";
+				sql += "     , isnull(b.rptnm,'') as emr_scan_class_name" + "\r\n";
+				sql += "     , isnull(a.fld2qty,'') as sub_page_list" + "\r\n";
+				sql += "     , isnull(a.fld3qty,'') as sub_page_no" + "\r\n";
+				sql += "     , isnull(a.fld6cd,'') as hx_type" + "\r\n";
+				sql += "  from ta88 a left join tg01 b on b.rptcd=a.fld3cd" + "\r\n";
+				sql += " where a.mst1cd='EMR' and a.mst2cd='FORM'" + "\r\n";
+				sql += "   and isnull(a.fld5cd,'')<>'2'" + "\r\n"; // 2025.09.18 WOOIL - 제외기능
+				sql += " order by case when isnull(a.fld1cd,'')='' or isnumeric(a.fld1cd)=0" + "\r\n"; // 2026.10.19 WOOIL - varchar -> numeric 오류 수정
+				sql += "       then 0" + "\r\n";
+				sql += "       else convert(numeric,a.fld1cd)" + "\r\n";
+				sql += "  end";				
 			}
 			String rsString = sqlHelper.executeQuery(sql);
 			returnString = rsString;
